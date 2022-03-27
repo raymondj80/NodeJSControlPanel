@@ -1,0 +1,34 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "cloud web app for controlling lab instruments",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raymondj80/cloudcontrolpanel.git"
+  },
+  "author": "Raymond Jow",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/raymondj80/cloudcontrolpanel/issues"
+  },
+  "homepage": "https://github.com/raymondj80/cloudcontrolpanel#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "firebase-admin": "^10.0.2",
+    "socket.io": "^4.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "engines": {
+    "node": "14.x"
+  }
+}
