@@ -7,18 +7,27 @@ const url = 'https://njscontrolwebapp.herokuapp.com/';
 
 class SocketService {
     static socket;
+    static temp_store_files = [];
     static connect() {
         this.socket = io.connect(url);
         this.socket.on("connect", () => {
-            console.log("client connected via", this.socket.id);
+            // console.log("client connected via", this.socket.id);
         });
         this.socket.on("client", (client) => {
             console.log(client);
         });
         this.socket.on("stopped_recording", (filename) => {
-            console.log('uploading ', filename);
-            SocketService.uploadFile(filename);
+            console.log('pushing ', filename);
+            SocketService.temp_store_files.push(filename);
         });
+        this.socket.on("finished_script", () => {
+            SocketService.temp_store_files.forEach((filename) => {
+                console.log('uploading ', filename);
+                SocketService.uploadFile(filename).then(() => {
+                    SocketService.temp_store_files.pop()
+                });
+            });
+        })
     }
 
     static async fetchData() {
@@ -55,9 +64,10 @@ class SocketService {
     }
 
     static disconnect() {
-        if (thi)
-        this.socket.close();
-        console.log("socket disconnected");
+        if (this.socket) {
+            this.socket.close();
+            console.log("socket disconnected");
+        }
     }
 
     static #parseJSONtoCSV(jsonData) {

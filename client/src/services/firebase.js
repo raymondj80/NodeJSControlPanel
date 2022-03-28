@@ -73,6 +73,18 @@ class FireBase {
     })
 }
 
+static async getFileData(filename) {
+    const q = query(collection(this.db, "record_data"), 
+                    where("user_id", "==", this.auth.currentUser.uid), 
+                    where("name", "==", filename));
+
+    return new Promise((resolve) => {
+        getDocs(q).then((querySnapshot) => {
+            resolve(querySnapshot.docs[0].data().data);
+        })
+    })
+}
+
   static async deleteScript(script_name) {
     const q = query(collection(this.db, "scripts"), 
                     where("user_id", "==", this.auth.currentUser.uid), 
