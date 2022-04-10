@@ -32,7 +32,7 @@ const db = firebaseApp.firestore();
 require("./record.js")(db);
 
 app.use(cors);
-app.use('/', serveStatic(path.join(__dirname,"../public/dist/static/"))); 
+// app.use('/', serveStatic(path.join(__dirname,"../public/dist/static/"))); 
 
 //Admin connection
 io.of("/admin").on("connection", (socket) => {
