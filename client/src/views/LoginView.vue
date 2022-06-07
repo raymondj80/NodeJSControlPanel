@@ -59,7 +59,7 @@ export default {
             .then(() => {
                 console.log(FireBase.auth.currentUser);
                 this.$router.push({
-                    path: '/'
+                    name: 'Home'
                 })
             }).catch((err) => {
                 switch (err.code) {

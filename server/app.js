@@ -1,8 +1,6 @@
 const express = require('express');
-const path = require('path')
 const app = express();
-const serveStatic = require('serve-static');
-require('dotenv').config();
+const path = require('path');
 const http = require('http').Server(app);
 const cors = require('cors');
 const {Record} = require("./record.js");
@@ -10,11 +8,11 @@ const RunScript = require("./runscript");
 const socketIO = require('socket.io');
 const admin = require('firebase-admin');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 const io = socketIO(http, {
     cors: {
-        origin: "http://localhost:8080",
+        origin: "http://njscontrolwebapp.herokuapp.com",
         methods: ["GET", "POST"]
     }
 });
@@ -31,10 +29,16 @@ const firebaseApp = admin.initializeApp({
 const db = firebaseApp.firestore();
 require("./record.js")(db);
 
-app.use(cors);
-// app.use('/', serveStatic(path.join(__dirname,"../public/dist/static/"))); 
+// Serve distribution folder
+app.use(express.static(path.join(__dirname, '/dist')));
 
-//Admin connection
+// app.use(cors);
+
+app.get('/*', function(req, res) {
+    res.sendFile(__dirname + "/dist/index.html");
+});
+
+// //Admin connection
 io.of("/admin").on("connection", (socket) => {
     console.log("New admin client");
     socket.on("return_data", (data) => {
@@ -45,11 +49,14 @@ io.of("/admin").on("connection", (socket) => {
         console.log(msg);
         if (msg["num"] == -1) {
             console.log("finished script");
+            io.of("/").to(RunScript.socket_id).emit("finished_script");
             RunScript.isRunning = false;
         } else if(msg["record"] == true && !RunScript.startedRecording) {
             Record.clients_recording.push(new Record(1440, msg["file"], RunScript.client_id));
             RunScript.startedRecording = true;
             RunScript.filename = msg["file"];
+            console.log("filename", msg["file"]);
+            // console.log("started script recording", Record.clients_recording);
 
         } else if (msg["record"] == false && RunScript.startedRecording) {
             io.of("/").to(RunScript.socket_id).emit("stopped_recording", RunScript.filename);
@@ -60,7 +67,7 @@ io.of("/admin").on("connection", (socket) => {
     });
 });
 
-// // Client side connection
+// // // Client side connection
 io.on("connection", (socket) => {
     console.log("client connected");
     if (io.of("/").sockets.size > 0) {
